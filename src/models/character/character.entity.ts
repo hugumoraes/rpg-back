@@ -9,9 +9,10 @@ import {
   OneToMany,
 } from 'typeorm';
 
+import { CharacterAttribute } from '../character-attribute/character-attribute.entity';
+import { CharacterItem } from '../character-item/character-item.entity';
 import { Class } from '../class/class.entity';
 import { User } from '../user/user.entity';
-import { CharacterAttribute } from '../character-attribute/character-attribute.entity';
 
 @Entity({ name: 'characters' })
 export class Character {
@@ -34,6 +35,9 @@ export class Character {
     character_attribute => character_attribute.character,
   )
   character_attributes: CharacterAttribute[];
+
+  @OneToMany(() => CharacterItem, character_item => character_item.character)
+  character_items: CharacterItem[];
 
   @Column({ type: 'boolean', default: true })
   alive: boolean;

@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 
 /* ---------- Common ---------- */
+import { create_http_error } from '../../common/errors/http';
 import { logger } from '../../common/utils/logs';
 
 /* ---------- Repositories ---------- */
@@ -33,6 +34,13 @@ export class CharactersController {
 
     const character = await this.characters_repository.get_character_by_id({
       character_id: Number(character_id),
+      relations: [
+        'class',
+        'character_attributes',
+        'character_attributes.attribute',
+        'character_items',
+        'character_items.item',
+      ],
     });
 
     this.logger.info('Character found.');
@@ -62,24 +70,6 @@ export class CharactersController {
       user_id,
     });
 
-    const character = await this.characters_repository.create_character({
-      class_id,
-      user_id,
-      name,
-    });
-
-    if (!character) {
-      this.logger.info('Error creating character.');
-      this.logger.debug(character);
-
-      return response.status(400).json({
-        message: 'Error creating character',
-      });
-    }
-
-    this.logger.info('Character created.');
-    this.logger.debug(character);
-
     this.logger.info('Getting class attributes...');
 
     const class_attributes =
@@ -91,18 +81,26 @@ export class CharactersController {
     this.logger.info('Class attributes found.');
     this.logger.debug(class_attributes);
 
-    for (const class_attribute of class_attributes) {
-      this.logger.info('Creating character attribute...');
-      this.logger.debug(class_attribute);
+    const character =
+      await this.characters_repository.create_character_with_attributes({
+        class_attributes,
+        class_id,
+        name,
+        user_id,
+      });
 
-      await this.attributes_repository.create_character_attribute({
-        attribute_id: class_attribute.attribute.attribute_id,
-        character_id: character.character_id,
-        value: class_attribute.default_value,
+    if (!character) {
+      this.logger.error('Character not created.');
+
+      return create_http_error({
+        code: 400,
+        response,
+        message: 'Error creating character.',
       });
     }
 
-    this.logger.info('Character attributes created.');
+    this.logger.info('Character created.');
+    this.logger.debug(character);
 
     return response.status(200).json({
       ...character,

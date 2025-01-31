@@ -53,11 +53,21 @@ CREATE TABLE "class_attribute" (
   FOREIGN KEY ("attribute_id") REFERENCES "attributes" ("attribute_id") ON DELETE CASCADE
 );
 
--- CREATE TABLE "item" (
---   "item_id" SERIAL PRIMARY KEY,
---   "item_type_id" INTEGER,
---   "name" VARCHAR UNIQUE NOT NULL
--- );
+CREATE TABLE "items" (
+  "item_id" SERIAL PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL,
+  "description" TEXT,
+  "value" INTEGER DEFAULT 0,
+  "rarity" VARCHAR DEFAULT 'common'
+);
+
+CREATE TABLE "character_item" (
+  "character_item_id" SERIAL PRIMARY KEY,
+  "character_id" INTEGER,
+  "item_id" INTEGER,
+  FOREIGN KEY ("character_id") REFERENCES "characters" ("character_id") ON DELETE CASCADE,
+  FOREIGN KEY ("item_id") REFERENCES "items" ("item_id") ON DELETE CASCADE
+);
 
 -- CREATE TABLE "item_attribute" (
 --   "item_attribute_id" SERIAL PRIMARY KEY,
@@ -68,13 +78,7 @@ CREATE TABLE "class_attribute" (
 --   FOREIGN KEY ("attribute_id") REFERENCES "attributes" ("attribute_id") ON DELETE CASCADE
 -- );
 
--- CREATE TABLE "character_item" (
---   "character_item_id" SERIAL PRIMARY KEY,
---   "character_id" INTEGER,
---   "item_id" INTEGER,
---   FOREIGN KEY ("character_id") REFERENCES "characters" ("character_id") ON DELETE CASCADE,
---   FOREIGN KEY ("item_id") REFERENCES "item" ("item_id") ON DELETE CASCADE
--- );
+
 
 -- CREATE TABLE "equipment_slot" (
 --   "equipment_slot_id" SERIAL PRIMARY KEY,
@@ -90,15 +94,6 @@ CREATE TABLE "class_attribute" (
 --   FOREIGN KEY ("equipment_slot_id") REFERENCES "equipment_slot" ("equipment_slot_id") ON DELETE CASCADE,
 --   FOREIGN KEY ("character_id") REFERENCES "characters" ("character_id") ON DELETE CASCADE,
 --   FOREIGN KEY ("item_id") REFERENCES "item" ("item_id") ON DELETE CASCADE
--- );
-
--- CREATE TABLE "character_class" (
---   "character_class_id" SERIAL PRIMARY KEY,
---   "character_id" INTEGER,
---   "class_id" INTEGER,
---   CONSTRAINT unique_character_class UNIQUE ("character_id", "class_id"),
---   FOREIGN KEY ("character_id") REFERENCES "characters" ("character_id") ON DELETE CASCADE,
---   FOREIGN KEY ("class_id") REFERENCES "class" ("class_id") ON DELETE CASCADE
 -- );
 
 -- CREATE TABLE "ability_type" (
@@ -216,33 +211,45 @@ INSERT INTO attributes ("name", "description") VALUES
 ('Intelligence', 'A measure of a character''s problem-solving ability.'),
 ('Luck', 'A measure of a character having chance to favor him or her.');
 
--- Warrior: High Strength, Low Intelligence, Moderate Dexterity, Low Luck
-INSERT INTO class_attribute (class_id, attribute_id, default_value) VALUES
+-- Warrior:
+INSERT INTO class_attribute (class_id, attribute_id, default_value)
+VALUES
   (1, 1, 10), -- Strength = 10
   (1, 2, 5),  -- Dexterity = 5
   (1, 3, 2),  -- Intelligence = 2
   (1, 4, 3);  -- Luck = 3
 
--- Mage: High Intelligence, Low Strength, Moderate Dexterity, Moderate Luck
-INSERT INTO class_attribute (class_id, attribute_id, default_value) VALUES
+-- Mage:
+INSERT INTO class_attribute (class_id, attribute_id, default_value)
+VALUES
   (2, 1, 2),  -- Strength = 1
   (2, 2, 4),  -- Dexterity = 4
   (2, 3, 10), -- Intelligence = 10
   (2, 4, 5);  -- Luck = 5
 
--- Rogue: High Dexterity, Moderate Strength, Moderate Luck, Low Intelligence
-INSERT INTO class_attribute (class_id, attribute_id, default_value) VALUES
+-- Rogue:
+INSERT INTO class_attribute (class_id, attribute_id, default_value)
+VALUES
   (3, 1, 5),  -- Strength = 5
   (3, 2, 10), -- Dexterity = 8
   (3, 3, 4),  -- Intelligence = 1
   (3, 4, 6);  -- Luck = 6
 
--- Ranger: Balanced Dexterity and Strength, Moderate Intelligence, High Luck
-INSERT INTO class_attribute (class_id, attribute_id, default_value) VALUES
+-- Ranger:
+INSERT INTO class_attribute (class_id, attribute_id, default_value)
+VALUES
   (4, 1, 6),  -- Strength = 2
   (4, 2, 8),  -- Dexterity = 10
   (4, 3, 5),  -- Intelligence = 2
   (4, 4, 9);  -- Luck = 6
+
+INSERT INTO items ("name", "description", "value", "rarity")
+VALUES
+  ('Iron Sword', 'A sturdy iron sword, commonly used by warriors.', 15, 'common'),
+  ('Health Potion', 'A small vial that restores health when consumed.', 10, 'common'),
+  ('Leather Armor', 'Basic armor made of hardened leather.', 20, 'common'),
+  ('Magic Wand', 'A simple wooden wand infused with weak magical energy.', 25, 'rare'),
+  ('Thief’s Dagger', 'A small, sharp dagger preferred by rogues.', 18, 'common');
 
 -- INSERT INTO equipment_slot (name) VALUES
 -- ('head'),
@@ -300,3 +307,14 @@ INSERT INTO class_attribute (class_id, attribute_id, default_value) VALUES
 
 INSERT INTO users (first_name, last_name, email, "password", created_at, updated_at)
 VALUES ('John', 'Doe', 'john.doe@example.com', '$2b$10$0AZpuQOj7ATWzZo1s/hIg.UVVPgtTeZPMgjdtsX7z5dGxC2y6tHrO', NOW(), NOW());
+
+INSERT INTO characters (class_id, name, user_id, "money")
+VALUES
+  (1, 'Aragorn', 1, 10000);
+
+INSERT INTO character_attribute (character_id, attribute_id, value)
+VALUES
+  (1, 1, 2),
+  (1, 2, 4),
+  (1, 3, 10),
+  (1, 4, 5);
