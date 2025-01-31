@@ -15,6 +15,34 @@ export class CharactersController {
   private characters_repository = new CharacterRepository();
 
   /**
+   * @description Get all characters
+   * @param request
+   * @param response
+   * @returns Repository<Character[]>
+   */
+  public get_characters = async (
+    request: Request,
+    response: Response,
+  ): Promise<Response> => {
+    const { user_id } = request.params;
+
+    this.logger.info('Getting all characters...');
+    this.logger.debug({
+      user_id,
+    });
+
+    const characters = await this.characters_repository.get_characters({
+      user_id: Number(user_id),
+      relations: ['class'],
+    });
+
+    this.logger.info('Characters found.');
+    this.logger.debug(characters);
+
+    return response.status(200).json(characters);
+  };
+
+  /**
    * @description Get a character by id
    * @param request
    * @param response
@@ -34,21 +62,23 @@ export class CharactersController {
 
     const character = await this.characters_repository.get_character_by_id({
       character_id: Number(character_id),
+      user_id: Number(user_id),
       relations: [
         'class',
         'character_attributes',
         'character_attributes.attribute',
         'character_items',
         'character_items.item',
+        'character_equipment',
+        'character_equipment.equipment_slot',
+        'character_equipment.item',
       ],
     });
 
     this.logger.info('Character found.');
     this.logger.debug(character);
 
-    return response.status(200).json({
-      character,
-    });
+    return response.status(200).json(character);
   };
 
   /**
@@ -61,7 +91,8 @@ export class CharactersController {
     request: Request,
     response: Response,
   ): Promise<Response> => {
-    const { user_id, class_id, name } = request.body;
+    const { user_id } = request.params;
+    const { class_id, name } = request.body;
 
     this.logger.info('Creating a character...');
     this.logger.debug({
@@ -81,13 +112,28 @@ export class CharactersController {
     this.logger.info('Class attributes found.');
     this.logger.debug(class_attributes);
 
-    const character =
+    const { character_id } =
       await this.characters_repository.create_character_with_attributes({
         class_attributes,
         class_id,
         name,
-        user_id,
+        user_id: Number(user_id),
       });
+
+    const character = await this.characters_repository.get_character_by_id({
+      character_id,
+      user_id: Number(user_id),
+      relations: [
+        'class',
+        'character_attributes',
+        'character_attributes.attribute',
+        'character_items',
+        'character_items.item',
+        'character_equipment',
+        'character_equipment.equipment_slot',
+        'character_equipment.item',
+      ],
+    });
 
     if (!character) {
       this.logger.error('Character not created.');

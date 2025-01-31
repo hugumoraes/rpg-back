@@ -27,5 +27,11 @@ export interface CreateCharacterItem {
 
 export interface GetCharacterById {
   character_id: number;
+  user_id: number;
+  relations: string[];
+}
+
+export interface GetCharacters {
+  user_id: number;
   relations: string[];
 }

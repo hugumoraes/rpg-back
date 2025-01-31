@@ -20,6 +20,12 @@ export class AttributeRepository {
   private readonly class_attribute_repository =
     PostgresDataSource.getRepository(ClassAttribute);
 
+  public get_attributes = async (): Promise<Attribute[]> => {
+    const attributes = await this.attribute_repository.find({});
+
+    return attributes;
+  };
+
   public get_attribute_by_id = async ({
     attribute_id,
   }: GetAttributeById): Promise<Attribute | null> => {

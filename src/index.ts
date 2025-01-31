@@ -9,7 +9,7 @@ import { logger } from './common/utils/logs';
 import { routes } from './routes';
 
 /* ---------- Helpers constants ---------- */
-const port = 3333;
+const port = 3334;
 
 /**
  * @description Manages NodeJS server settings.

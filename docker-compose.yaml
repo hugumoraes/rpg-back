@@ -8,7 +8,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: rpg
     volumes:
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql/1_create_tables.sql:/docker-entrypoint-initdb.d/1_create_tables.sql
+      - ./sql/2_populate_data.sql:/docker-entrypoint-initdb.d/2_populate_data.sql
     ports:
       - '5432:5432'
   backend:
@@ -19,7 +20,7 @@ services:
     depends_on:
       - db
     ports:
-      - '3333:3333'
+      - '3334:3334'
     volumes:
       - ../:/projects
     command: apt-get update && apt-get install -y build-essential && apt-get install -y python
@@ -29,7 +30,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: rpg
       POSTGRES_PORT: 5432
-      PORT: 3333
+      PORT: 3334
       HOST: 0.0.0.0
       SECRET_KEY: secret
-

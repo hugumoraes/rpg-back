@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 import { CharacterAttribute } from '../character-attribute/character-attribute.entity';
 import { ClassAttribute } from '../class-attribute/class-attribute.entity';
+import { ItemAttribute } from '../item-attribute/item-attribute.entity';
 
 @Entity({ name: 'attributes' })
 export class Attribute {
@@ -22,4 +23,7 @@ export class Attribute {
 
   @OneToMany(() => ClassAttribute, class_attribute => class_attribute.attribute)
   class_attributes: ClassAttribute[];
+
+  @OneToMany(() => ItemAttribute, item_attribute => item_attribute.attribute)
+  item_attributes: ItemAttribute[];
 }

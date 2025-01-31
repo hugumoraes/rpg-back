@@ -24,8 +24,8 @@ export class StoreController {
     request: Request,
     response: Response,
   ): Promise<Response> => {
-    const { character_id, user_id } = request.body;
-    const { item_id } = request.params;
+    const { character_id } = request.body;
+    const { item_id, user_id } = request.params;
 
     this.logger.info('Purchasing an item...');
     this.logger.debug({
@@ -35,6 +35,7 @@ export class StoreController {
     });
 
     const character = await this.characters_repository.get_character_by_id({
+      user_id: Number(user_id),
       character_id: Number(character_id),
       relations: ['character_items'],
     });

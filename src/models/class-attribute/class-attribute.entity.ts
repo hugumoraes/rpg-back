@@ -23,5 +23,5 @@ export class ClassAttribute {
   attribute: Attribute;
 
   @Column({ default: 0 })
-  default_value: number;
+  value: number;
 }

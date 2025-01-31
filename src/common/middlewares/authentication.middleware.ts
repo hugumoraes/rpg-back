@@ -15,6 +15,9 @@ import { create_http_error } from '../errors/http';
 interface AuthenticatedRequest extends Request {
   body: {
     user_id?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
   };
 }
 
@@ -47,7 +50,7 @@ const authentication_middleware: RequestHandler = (
     logger.debug('Decoded token: ');
     logger.debug(decoded);
 
-    request.body.user_id = decoded.user_id;
+    request.params.user_id = decoded.user_id;
 
     next();
   } catch (error) {

@@ -8,6 +8,7 @@ import {
   CreateCharacterItem,
   CreateCharacterWithAttributes,
   GetCharacterById,
+  GetCharacters,
 } from '../../types/characters.types';
 
 /* ---------- Common ---------- */
@@ -33,16 +34,36 @@ export class CharacterRepository {
 
   public get_character_by_id = async ({
     character_id,
+    user_id,
     relations,
   }: GetCharacterById): Promise<Character | null> => {
     const character = await this.character_repository.findOne({
       where: {
         character_id,
+        user: {
+          user_id,
+        },
       },
       relations,
     });
 
     return character;
+  };
+
+  public get_characters = async ({
+    user_id,
+    relations,
+  }: GetCharacters): Promise<Character[]> => {
+    const characters = await this.character_repository.find({
+      where: {
+        user: {
+          user_id,
+        },
+      },
+      relations,
+    });
+
+    return characters;
   };
 
   public create_character = async ({
@@ -98,7 +119,7 @@ export class CharacterRepository {
               attribute: {
                 attribute_id: class_attribute.attribute.attribute_id,
               },
-              value: class_attribute.default_value,
+              value: class_attribute.value,
             });
           }
 
